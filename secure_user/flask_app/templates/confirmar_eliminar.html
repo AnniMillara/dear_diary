@@ -1,0 +1,1 @@
+{% extends "base.html" %}{% block title %}Confirmar eliminación{% endblock %}{% block contenido %}<section class="card confirm"><h1>Confirmar eliminación</h1><p>{{ mensaje }}</p><form method="post" action="{{ accion }}"><button class="danger">Sí, eliminar</button> <a class="btn secondary" href="{{ cancelar }}">Cancelar</a></form></section>{% endblock %}
