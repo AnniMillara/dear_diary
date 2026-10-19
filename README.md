@@ -1,0 +1,2 @@
+# dear_diary
+✎ᝰ。
