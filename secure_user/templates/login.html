@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Iniciar sesión — Querido Diario{% endblock %}
+{% block contenido %}
+<div class="auth-wrapper">
+    <section class="auth-card">
+        <h1 class="auth-title">📖 Querido Diario</h1>
+        <p class="auth-subtitle">Un espacio privado para tus pensamientos.</p>
+        <h2 class="card-heading">Iniciar sesión</h2>
+        <form method="post" action="{{ url_for('auth.login') }}">
+            <div class="form-group">
+                <label for="nombre_usuario">Nombre de usuario</label>
+                <input type="text" id="nombre_usuario" name="nombre_usuario" class="form-control"
+                       value="{{ nombre or '' }}" required maxlength="50" autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="contrasena">Contraseña</label>
+                <input type="password" id="contrasena" name="contrasena" class="form-control"
+                       required autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Entrar</button>
+        </form>
+        <p class="auth-footer">¿No tienes cuenta? <a href="{{ url_for('auth.registro') }}">Regístrate</a></p>
+    </section>
+</div>
+{% endblock %}

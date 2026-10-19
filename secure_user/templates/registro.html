@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Registro — Querido Diario{% endblock %}
+{% block contenido %}
+<div class="auth-wrapper">
+    <section class="auth-card">
+        <h1 class="auth-title">📖 Querido Diario</h1>
+        <p class="auth-subtitle">Crea tu espacio privado.</p>
+        <h2 class="card-heading">Crear cuenta</h2>
+        <form method="post" action="{{ url_for('auth.registro') }}">
+            <div class="form-group">
+                <label for="nombre_usuario">Nombre de usuario</label>
+                <input type="text" id="nombre_usuario" name="nombre_usuario" class="form-control"
+                       value="{{ nombre or '' }}" minlength="3" maxlength="50" required autocomplete="username">
+                <small class="form-help">Entre 3 y 50 caracteres.</small>
+            </div>
+            <div class="form-group">
+                <label for="contrasena">Contraseña</label>
+                <input type="password" id="contrasena" name="contrasena" class="form-control"
+                       minlength="8" maxlength="128" required autocomplete="new-password">
+            </div>
+            <div class="form-group">
+                <label for="confirmar_contrasena">Confirmar contraseña</label>
+                <input type="password" id="confirmar_contrasena" name="confirmar_contrasena"
+                       class="form-control" minlength="8" maxlength="128" required autocomplete="new-password">
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Crear cuenta</button>
+        </form>
+        <p class="auth-footer">¿Ya tienes cuenta? <a href="{{ url_for('auth.login') }}">Inicia sesión</a></p>
+    </section>
+</div>
+{% endblock %}

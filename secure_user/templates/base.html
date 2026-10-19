@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Querido Diario{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    {% if session.get('usuario_id') %}
+    <nav class="navbar-diario">
+        <div class="navbar-inner">
+            <a href="{{ url_for('entrada.listar') }}" class="brand">📖 Querido Diario</a>
+            <div class="nav-links">
+                <a href="{{ url_for('entrada.listar') }}">Mis entradas</a>
+                <a href="{{ url_for('entrada.nueva') }}">+ Nueva</a>
+                <a href="{{ url_for('entrada.buscar') }}">Buscar</a>
+                <span class="nav-user">Hola, {{ session.get('nombre_usuario') }}</span>
+                <form class="logout-form" method="post" action="{{ url_for('auth.logout') }}">
+                    <button type="submit" class="nav-logout">Cerrar sesión</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}" role="status">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block contenido %}{% endblock %}
+    </main>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
