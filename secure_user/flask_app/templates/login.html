@@ -1,1 +1,54 @@
-{% extends "base.html" %}{% block title %}Querido Diario - Acceso{% endblock %}{% block contenido %}<header class="login-header"><h1>📖 Querido Diario</h1><p>Tu espacio privado para escribir cada día.</p></header><div class="grid-2"><section class="card"><h2>Crear cuenta</h2><form method="post" action="{{ url_for('registro') }}"><label>Nombre de usuario</label><input name="nombre" minlength="3" maxlength="50" required><label>Contraseña</label><input type="password" name="contrasena" minlength="8" required><label>Confirmar contraseña</label><input type="password" name="confirmar_contrasena" minlength="8" required><button>Registrarse</button></form></section><section class="card"><h2>Iniciar sesión</h2><form method="post" action="{{ url_for('login') }}"><label>Nombre de usuario</label><input name="nombre" required><label>Contraseña</label><input type="password" name="contrasena" required><button>Iniciar sesión</button></form></section></div>{% endblock %}
+{% extends "base.html" %}
+{% block title %}Querido Diario - Iniciar Sesión{% endblock %}
+
+{% block contenido %}
+<div class="login-header">
+    <h1>𖡎 Querido Diario</h1>
+    <p>Tu espacio privado para escribir cada día ˙ᵕ˙</p>
+</div>
+
+<div class="grid-2">
+    <div class="login-card">
+        <h3>Crear Cuenta</h3>
+        <form method="post" action="{{ url_for('registro') }}">
+            <div class="mb-3">
+                <label>Nombre</label>
+                <input type="text" name="nombre" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label>Apellido</label>
+                <input type="text" name="apellido" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label>E-mail</label>
+                <input type="email" name="email" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label>Contraseña</label>
+                <input type="password" name="contrasena" class="form-control" required minlength="8" required>
+                <small style="font-size:0.75rem; color:#5a6b5e; display:block; margin-top:4px;">Mín. 8 caracteres, 1 mayúscula, 1 número y 1 símbolo.</small>
+            </div>
+            <div class="mb-3">
+                <label>Confirmar Contraseña</label>
+                <input type="password" name="confirmar_contrasena" class="form-control" required minlength="8">
+            </div>
+            <button type="submit" class="btn btn-dark w-100">Registrarse</button>
+        </form>
+    </div>
+
+    <div class="login-card">
+        <h3>Iniciar Sesión</h3>
+        <form method="post" action="{{ url_for('login') }}">
+            <div class="mb-3">
+                <label>E-mail</label>
+                <input type="email" name="email" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label>Contraseña</label>
+                <input type="password" name="contrasena" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-dark w-100">Iniciar Sesión</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

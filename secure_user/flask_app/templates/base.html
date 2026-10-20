@@ -1,1 +1,52 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{% block title %}Querido Diario{% endblock %}</title><link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"></head><body>{% if session.get('id_usuario') %}<nav class="navbar"><a class="brand" href="{{ url_for('listado_entradas') }}">📖 Querido Diario</a><div class="links"><a href="{{ url_for('listado_entradas') }}">Mis Entradas</a><a href="{{ url_for('nueva_entrada') }}">Nueva Entrada +</a><a href="{{ url_for('buscar_entradas') }}">Buscar</a><a href="{{ url_for('logout') }}">Cerrar sesión</a></div></nav>{% endif %}<main class="container">{% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}<div class="alert alert-{{ category }}">{{ message }}</div>{% endfor %}{% endwith %}{% block contenido %}{% endblock %}</main><script src="{{ url_for('static', filename='js/script.js') }}"></script></body></html>
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Querido Diario{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    {% if session.get('id_usuario') %}
+    <nav class="navbar-bookhub">
+        <div class="navbar-inner">
+            <a href="{{ url_for('listado_entradas') }}" class="brand">𖡎 Querido Diario</a>
+            <div class="nav-links">
+                <a href="{{ url_for('nueva_entrada') }}">+ Nueva Entrada</a>
+                <span class="navbar-user">| {{ session.get('nombre') }} |</span>
+                <a href="{{ url_for('logout') }}">Cerrar</a>
+                <span class="navbar-user">|</span>
+                <form method="post" action="{{ url_for('eliminar_usuario') }}"
+                    onsubmit="return confirm('¿Eliminar tu cuenta?');" style="display:inline; margin:0;">
+                    <button type="submit" class="btn-text-danger">Borrar</button>
+                </form>
+                <span class="navbar-user">|</span>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {% block contenido %}{% endblock %}
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+
+</html>

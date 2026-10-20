@@ -1,1 +1,26 @@
-{% extends "base.html" %}{% block title %}Entrada del {{ entrada.fecha.strftime('%Y-%m-%d') }}{% endblock %}{% block contenido %}<header class="page-header"><div><h1>{{ entrada.fecha.strftime('%Y-%m-%d') }}</h1><p>Una página de tu diario.</p></div><a class="btn secondary" href="{{ url_for('listado_entradas') }}">← Volver</a></header><section class="card"><div class="fecha-grande">{{ entrada.fecha.strftime('%d/%m/%Y') }}</div><div class="contenido-entrada">{{ entrada.contenido }}</div></section><p><a class="btn secondary" href="{{ url_for('editar_entrada', id=entrada.id_entrada) }}">Editar</a> <a class="btn danger" href="{{ url_for('confirmar_eliminar_entrada', id=entrada.id_entrada) }}">Eliminar</a></p>{% endblock %}
+{% extends "base.html" %}
+{% block title %}Entrada del {{ entrada.fecha.strftime('%Y-%m-%d') }}{% endblock %}
+{% block contenido %}
+
+<div class="page-header">
+    <div>
+        <h2>Entrada del {{ entrada.fecha.strftime('%Y-%m-%d') }}</h2>
+        <p>Una página de tu diario.</p>
+    </div>
+    <a class="btn btn-secondary" href="{{ url_for('listado_entradas') }}">← Volver</a>
+</div>
+
+<div class="card-bookhub">
+    <div class="entrada-header" style="margin-bottom: 16px;">
+        <span class="entrada-titulo">Entrada</span>
+        <span class="entrada-emoji">{{ entrada.emoji or '📝' }}</span>
+    </div>
+    <div class="entrada-fecha" style="margin-bottom: 24px;">✦ {{ entrada.fecha.strftime('%d/%m/%Y') }}</div>
+    <div style="white-space: pre-wrap; font-size: 1.05rem; line-height: 1.8;">{{ entrada.contenido }}</div>
+</div>
+
+<div class="d-flex gap-2 flex-wrap mt-4">
+    <a class="btn btn-secondary" href="{{ url_for('editar_entrada', id=entrada.id_entrada) }}">Editar</a>
+    <a class="btn btn-danger" href="{{ url_for('confirmar_eliminar_entrada', id=entrada.id_entrada) }}">Eliminar</a>
+</div>
+{% endblock %}

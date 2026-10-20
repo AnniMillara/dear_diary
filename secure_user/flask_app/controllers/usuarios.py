@@ -4,28 +4,73 @@ from flask_app.models.usuario import Usuarios
 
 @app.route("/")
 def inicio():
-    return redirect(url_for("listado_entradas")) if "id_usuario" in session else render_template("login.html")
+    if "id_usuario" in session:
+        return redirect(url_for("listado_entradas"))
+    return render_template("login.html")
 
 @app.route("/registro", methods=["POST"])
 def registro():
-    datos = {"nombre": request.form.get("nombre", "").strip(), "contrasena": request.form.get("contrasena", ""), "confirmar_contrasena": request.form.get("confirmar_contrasena", "")}
-    if not Usuarios.validar_registro(datos): return redirect(url_for("inicio"))
-    nuevo_id = Usuarios.guardar({"nombre": datos["nombre"], "contrasena": bcrypt.generate_password_hash(datos["contrasena"]).decode("utf-8")})
-    session["id_usuario"] = nuevo_id; session["nombre"] = datos["nombre"]
-    flash("Usuario creado correctamente.", "success")
-    return redirect(url_for("listado_entradas"))
+    datos = {
+        "nombre": request.form.get("nombre", "").strip(),
+        "apellido": request.form.get("apellido", "").strip(),
+        "email": request.form.get("email", "").strip(),
+        "contrasena": request.form.get("contrasena", "").strip(),
+        "confirmar_contrasena": request.form.get("confirmar_contrasena", "").strip(),
+    }
+    errores = Usuarios.validar_registro(datos)
+    if errores:
+        for error in errores:
+            flash(error, "error")
+        return redirect(url_for("inicio"))
+        
+    hash_pw = bcrypt.generate_password_hash(datos["contrasena"]).decode("utf-8")
+    data = {"nombre": datos["nombre"], "apellido": datos["apellido"], "email": datos["email"], "contrasena": hash_pw}
+    
+    try:
+        nuevo_id = Usuarios.guardar(data)
+        if not nuevo_id:
+            flash("No fue posible crear el usuario.", "error")
+            return redirect(url_for("inicio"))
+        session["id_usuario"] = nuevo_id
+        session["nombre"] = datos["nombre"]
+        flash("Usuario creado correctamente.", "success")
+        return redirect(url_for("listado_entradas"))
+    except Exception:
+        flash("Error de conexión al crear la cuenta.", "error")
+        return redirect(url_for("inicio"))
 
 @app.route("/login", methods=["POST"])
 def login():
-    nombre = request.form.get("nombre", "").strip(); pw = request.form.get("contrasena", "")
-    usuario = Usuarios.buscar_nombre(nombre) if nombre else None
-    if not usuario or not bcrypt.check_password_hash(usuario.contrasena, pw):
-        flash("Nombre o contraseña incorrectos.", "error"); return redirect(url_for("inicio"))
-    session["id_usuario"] = usuario.id_usuario; session["nombre"] = usuario.nombre
-    flash("Bienvenido de vuelta.", "success")
-    return redirect(url_for("listado_entradas"))
+    email = request.form.get("email", "").strip()
+    contrasena = request.form.get("contrasena", "").strip()
+    
+    try:
+        usuario = Usuarios.buscar_email(email)
+        if not usuario or not bcrypt.check_password_hash(usuario.contrasena, contrasena):
+            flash("Email o contraseña incorrectos.", "error")
+            return redirect(url_for("inicio"))
+        session["id_usuario"] = usuario.id_usuario
+        session["nombre"] = usuario.nombre
+        flash("Bienvenido de vuelta.", "success")
+        return redirect(url_for("listado_entradas"))
+    except Exception:
+        flash("Error de conexión al iniciar sesión.", "error")
+        return redirect(url_for("inicio"))
 
 @app.route("/logout")
 def logout():
-    session.clear(); flash("Sesión cerrada.", "success")
+    session.clear()
+    flash("Sesión cerrada.", "success")
+    return redirect(url_for("inicio"))
+
+@app.route("/cuenta/eliminar", methods=["POST"])
+def eliminar_usuario():
+    if "id_usuario" not in session:
+        return redirect(url_for("inicio"))
+    try:
+        Usuarios.eliminar(session["id_usuario"])
+        session.clear()
+        flash("Cuenta eliminada.", "success")
+    except Exception:
+        flash("No se pudo eliminar la cuenta en este momento.", "error")
     return redirect(url_for("inicio"))

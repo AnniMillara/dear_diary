@@ -1,1 +1,12 @@
-{% extends "base.html" %}{% block title %}Confirmar eliminación{% endblock %}{% block contenido %}<section class="card confirm"><h1>Confirmar eliminación</h1><p>{{ mensaje }}</p><form method="post" action="{{ accion }}"><button class="danger">Sí, eliminar</button> <a class="btn secondary" href="{{ cancelar }}">Cancelar</a></form></section>{% endblock %}
+{% extends "base.html" %}
+{% block title %}Confirmar eliminación{% endblock %}
+{% block contenido %}
+<div class="card-bookhub text-center" style="max-width: 600px; margin: 40px auto; border-left: 4px solid var(--pin-cushion);">
+    <h2 style="color: var(--pin-cushion); margin-bottom: 16px;">Confirmar eliminación</h2>
+    <p style="margin-bottom: 24px; font-size: 1.1rem;">{{ mensaje }}</p>
+    <form method="post" action="{{ accion }}" class="d-flex gap-2 flex-wrap" style="justify-content: center;">
+        <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+        <a class="btn btn-secondary" href="{{ cancelar }}">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

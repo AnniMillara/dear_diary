@@ -1,68 +1,138 @@
 from datetime import datetime
-from flask import flash
 from flask_app.config.mysqlconnection import connectToMySQL
 
 DB = "esquema_diario"
-CONTENIDO_MAX = 5000
 
 class Entradas:
     def __init__(self, data):
         self.id_entrada = data["id_entrada"]
         self.fecha = data["fecha"]
         self.contenido = data["contenido"]
+        self.emoji = data.get("emoji", "📝")
         self.usuario_id = data["usuario_id"]
         self.created_at = data["created_at"]
         self.updated_at = data["updated_at"]
+        self.usuario_nombre = data.get("usuario_nombre")
+        self.usuario_apellido = data.get("usuario_apellido")
 
     @classmethod
     def guardar(cls, data):
-        return connectToMySQL(DB).query_db("INSERT INTO entradas (fecha, contenido, usuario_id, created_at, updated_at) VALUES (%(fecha)s, %(contenido)s, %(usuario_id)s, NOW(), NOW());", data)
+        query = """
+            INSERT INTO entradas (
+                fecha, 
+                contenido, 
+                emoji,
+                usuario_id, 
+                created_at, 
+                updated_at
+            ) VALUES (
+                %(fecha)s, 
+                %(contenido)s,
+                %(emoji)s,
+                %(usuario_id)s,
+                NOW(),
+                NOW()
+            );
+        """
+        return connectToMySQL(DB).query_db(query, data)
 
     @classmethod
     def ver_por_usuario(cls, usuario_id):
-        rows = connectToMySQL(DB).query_db("SELECT * FROM entradas WHERE usuario_id=%(usuario_id)s ORDER BY fecha DESC, id_entrada DESC;", {"usuario_id": usuario_id}) or []
-        return [cls(row) for row in rows]
+        query = """
+            SELECT 
+                e.*, 
+                u.nombre AS usuario_nombre, 
+                u.apellido AS usuario_apellido
+            FROM entradas e
+            JOIN usuarios u ON e.usuario_id = u.id_usuario
+            WHERE e.usuario_id = %(usuario_id)s
+            ORDER BY e.fecha DESC, e.id_entrada DESC;
+        """
+        resultados = connectToMySQL(DB).query_db(query, {"usuario_id": usuario_id})
+        return [cls(e) for e in resultados] if resultados else []
 
     @classmethod
-    def buscar_id_y_usuario(cls, id_entrada, usuario_id):
-        rows = connectToMySQL(DB).query_db("SELECT * FROM entradas WHERE id_entrada=%(id_entrada)s AND usuario_id=%(usuario_id)s;", {"id_entrada": id_entrada, "usuario_id": usuario_id})
-        return cls(rows[0]) if rows else None
+    def buscar_id(cls, id):
+        query = """
+            SELECT 
+                e.*, 
+                u.nombre AS usuario_nombre, 
+                u.apellido AS usuario_apellido
+            FROM entradas e
+            JOIN usuarios u ON e.usuario_id = u.id_usuario
+            WHERE e.id_entrada = %(id_entrada)s;
+        """
+        resultado = connectToMySQL(DB).query_db(query, {"id_entrada": id})
+        return cls(resultado[0]) if resultado else None
+
+    @classmethod
+    def buscar_texto(cls, usuario_id, texto):
+        query = """
+            SELECT 
+                e.id_entrada, 
+                e.fecha, 
+                e.contenido, 
+                e.emoji,
+                e.usuario_id, 
+                e.created_at,
+                e.updated_at,
+                u.nombre AS usuario_nombre, 
+                u.apellido AS usuario_apellido
+            FROM entradas e
+            JOIN usuarios u ON e.usuario_id = u.id_usuario
+            WHERE e.usuario_id = %(usuario_id)s
+              AND e.contenido LIKE %(texto)s
+            ORDER BY e.fecha DESC, e.id_entrada DESC;
+        """
+        data = {"usuario_id": usuario_id, "texto": f"%{texto}%"}
+        resultados = connectToMySQL(DB).query_db(query, data)
+        return [cls(e) for e in resultados] if resultados else []
 
     @classmethod
     def modificar(cls, data):
-        return connectToMySQL(DB).query_db("UPDATE entradas SET fecha=%(fecha)s, contenido=%(contenido)s, updated_at=NOW() WHERE id_entrada=%(id_entrada)s AND usuario_id=%(usuario_id)s;", data)
+        query = """
+            UPDATE entradas
+            SET 
+                fecha = %(fecha)s, 
+                contenido = %(contenido)s, 
+                emoji = %(emoji)s, 
+                updated_at = NOW()
+            WHERE id_entrada = %(id_entrada)s 
+              AND usuario_id = %(usuario_id)s;
+        """
+        return connectToMySQL(DB).query_db(query, data)
 
     @classmethod
-    def eliminar(cls, id_entrada, usuario_id):
-        return connectToMySQL(DB).query_db("DELETE FROM entradas WHERE id_entrada=%(id_entrada)s AND usuario_id=%(usuario_id)s;", {"id_entrada": id_entrada, "usuario_id": usuario_id})
-
-    @classmethod
-    def buscar(cls, usuario_id, fecha=None, texto=None):
-        query = "SELECT * FROM entradas WHERE usuario_id=%(usuario_id)s"
-        data = {"usuario_id": usuario_id}
-        if fecha:
-            query += " AND fecha=%(fecha)s"; data["fecha"] = fecha
-        if texto:
-            query += " AND contenido LIKE %(texto)s"; data["texto"] = f"%{texto}%"
-        query += " ORDER BY fecha DESC, id_entrada DESC;"
-        rows = connectToMySQL(DB).query_db(query, data) or []
-        return [cls(row) for row in rows]
+    def eliminar(cls, id, usuario_id):
+        query = """
+            DELETE FROM entradas 
+            WHERE id_entrada = %(id_entrada)s 
+              AND usuario_id = %(usuario_id)s;
+        """
+        return connectToMySQL(DB).query_db(query, {"id_entrada": id, "usuario_id": usuario_id})
 
     @staticmethod
     def validar(datos):
-        ok = True
-        fecha = datos.get("fecha", "").strip()
-        if not fecha:
-            flash("La fecha es obligatoria.", "error"); ok = False
+        errores = []
+        fecha_str = datos.get("fecha", "").strip()
+        
+        if not fecha_str:
+            errores.append("La fecha es obligatoria.")
         else:
             try:
-                if datetime.strptime(fecha, "%Y-%m-%d").date() > datetime.now().date():
-                    flash("No puedes registrar entradas con fechas futuras.", "error"); ok = False
+                if datetime.strptime(fecha_str, "%Y-%m-%d").date() > datetime.now().date():
+                    errores.append("No puedes registrar entradas con fechas futuras.")
             except ValueError:
-                flash("La fecha no tiene un formato válido.", "error"); ok = False
-        contenido = datos.get("contenido", "")
-        if not contenido.strip():
-            flash("El contenido no puede estar vacío.", "error"); ok = False
-        elif len(contenido.strip()) > CONTENIDO_MAX:
-            flash("El contenido no puede superar los 5000 caracteres.", "error"); ok = False
-        return ok
+                errores.append("La fecha no tiene un formato válido.")
+
+        contenido = datos.get("contenido", "").strip()
+        if not contenido:
+            errores.append("El contenido no puede estar vacío.")
+        elif len(contenido) > 5000:
+            errores.append("El contenido no puede superar los 5000 caracteres.")
+
+        emoji = datos.get("emoji", "").strip()
+        if len(emoji) > 10:
+            errores.append("El emoji es demasiado largo (máx. 10 caracteres).")
+
+        return errores

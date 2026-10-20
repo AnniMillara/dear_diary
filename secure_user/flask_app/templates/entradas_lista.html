@@ -1,1 +1,44 @@
-{% extends "base.html" %}{% block title %}Mis entradas{% endblock %}{% block contenido %}<header class="page-header"><div><h1>Mis entradas</h1><p>Todos tus recuerdos, ordenados por fecha.</p></div><a class="btn" href="{{ url_for('nueva_entrada') }}">+ Nueva entrada</a></header>{% if entradas %}<div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Contenido</th><th>Acciones</th></tr></thead><tbody>{% for e in entradas %}<tr><td>{{ e.fecha.strftime('%Y-%m-%d') }}</td><td>{{ e.contenido[:120] }}{% if e.contenido|length > 120 %}…{% endif %}</td><td><a href="{{ url_for('detalle_entrada', id=e.id_entrada) }}">Ver</a> · <a href="{{ url_for('editar_entrada', id=e.id_entrada) }}">Editar</a> · <a href="{{ url_for('confirmar_eliminar_entrada', id=e.id_entrada) }}">Borrar</a></td></tr>{% endfor %}</tbody></table></div>{% else %}<section class="card empty"><p>Todavía no has escrito ninguna entrada.</p><a class="btn" href="{{ url_for('nueva_entrada') }}">Escribir la primera</a></section>{% endif %}{% endblock %}
+{% extends "base.html" %}
+{% block title %}Mis Entradas{% endblock %}
+{% block contenido %}
+
+<div class="page-header">
+    <div>
+        <h2>Mis Entradas</h2>
+        <p>Consulta y administra tus recuerdos.</p>
+    </div>
+</div>
+
+<div class="buscador-wrap">
+    <span class="buscador-icono">🔎︎</span>
+    <input id="buscador" type="text" class="buscador-input" placeholder="Escribe para buscar en tiempo real..."
+        autocomplete="off">
+</div>
+
+<div id="entradas-grid" class="entradas-grid">
+    {% for e in entradas %}
+    <div class="entrada-card">
+        <div class="entrada-header">
+            <span class="entrada-titulo">Entrada</span>
+            <span class="entrada-emoji">{{ e.emoji or '📝' }}</span>
+        </div>
+        <div class="entrada-fecha">✦ {{ e.fecha.strftime('%d/%m/%Y') }}</div>
+        <div class="entrada-acciones">
+            <a href="{{ url_for('detalle_entrada', id=e.id_entrada) }}" class="btn btn-sm btn-info">Leer más</a>
+            <a href="{{ url_for('editar_entrada', id=e.id_entrada) }}" class="btn btn-sm btn-warning">Editar</a>
+            <a href="{{ url_for('confirmar_eliminar_entrada', id=e.id_entrada) }}"
+                class="btn btn-sm btn-danger">Eliminar</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div id="estado-vacio" class="card-bookhub text-center" style="{% if entradas %}display:none;{% endif %}">
+    <p class="text-muted mb-3">Todavía no tienes entradas. ¡Escribe la primera!</p>
+</div>
+
+<div id="sin-resultados" class="card-bookhub text-center" style="display:none;">
+    <p class="text-muted mb-3">No encontramos entradas que coincidan con tu búsqueda.</p>
+</div>
+
+{% endblock %}
