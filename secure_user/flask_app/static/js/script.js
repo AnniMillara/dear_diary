@@ -1,62 +1,44 @@
 document.addEventListener("DOMContentLoaded", () => {
+    // Cerrar las alertas después de unos segundos
     document.querySelectorAll(".alert").forEach((alerta) => {
         window.setTimeout(() => alerta.style.display = "none", 5000);
     });
 
     const input = document.getElementById("buscador");
     const grid = document.getElementById("entradas-grid");
+    const tarjetas = document.querySelectorAll(".entrada-card");
     const estadoVacio = document.getElementById("estado-vacio");
     const sinResultados = document.getElementById("sin-resultados");
-    const form = input ? input.closest("form") : null;
 
     if (!input || !grid) return;
 
-    if (form) {
-        form.addEventListener("submit", (e) => e.preventDefault());
-    }
-
-    let timeoutId = null;
-
-    const filtrar = () => {
-        const texto = input.value.trim().toLowerCase();
-        const tarjetas = grid.querySelectorAll(".entrada-card");
-        let visibles = 0;
+    // Filtrar las entradas mientras se escribe
+    input.addEventListener("input", () => {
+        const texto = input.value.toLowerCase().trim();
+        let tarjetasVisibles = 0;
 
         tarjetas.forEach((tarjeta) => {
-            // Buscamos en el texto completo de la tarjeta
-            const contenido = tarjeta.textContent.toLowerCase();
-            if (contenido.includes(texto)) {
-                tarjeta.style.display = "";
-                visibles++;
+            const contenido = tarjeta.getAttribute("data-contenido") || "";
+            const fecha = tarjeta.getAttribute("data-fecha") || "";
+
+            // Mostrar la tarjeta si coincide con la búsqueda
+            if (contenido.includes(texto) || fecha.includes(texto)) {
+                tarjeta.style.display = "flex";
+                tarjetasVisibles++;
             } else {
                 tarjeta.style.display = "none";
             }
         });
 
-        if (tarjetas.length === 0) {
+        // Mostrar mensaje si no hay resultados
+        if (tarjetasVisibles === 0 && texto !== "") {
             grid.style.display = "none";
-            estadoVacio.style.display = "block";
-            sinResultados.style.display = "none";
-            return;
-        }
-
-        if (visibles === 0) {
-            grid.style.display = "none";
-            estadoVacio.style.display = "none";
-            sinResultados.style.display = "block";
+            if (estadoVacio) estadoVacio.style.display = "none";
+            if (sinResultados) sinResultados.style.display = "block";
         } else {
             grid.style.display = "grid";
-            estadoVacio.style.display = "none";
-            sinResultados.style.display = "none";
+            if (estadoVacio) estadoVacio.style.display = "none";
+            if (sinResultados) sinResultados.style.display = "none";
         }
-    };
-
-    input.addEventListener("input", () => {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(filtrar, 200);
     });
-
-    if (input.value.trim() !== "") {
-        filtrar();
-    }
 });

@@ -16,19 +16,19 @@
 <body>
 
     {% if session.get('id_usuario') %}
+    <!-- Barra de navegación -->
     <nav class="navbar-bookhub">
         <div class="navbar-inner">
             <a href="{{ url_for('listado_entradas') }}" class="brand">𖡎 Querido Diario</a>
-
             <div class="nav-links">
-                <span class="navbar-user">| {{ session.get('nombre') }} |</span>
-
+                <a href="{{ url_for('nueva_entrada') }}" class="nav-btn">+ Nueva Entrada</a>
+                <span class="navbar-divider">|</span>
+                <span class="navbar-user">{{ session.get('nombre') }}</span>
+                <span class="navbar-divider">|</span>
                 <a href="{{ url_for('logout') }}" class="nav-btn">Cerrar</a>
                 <span class="navbar-divider">|</span>
-
                 <form method="post" action="{{ url_for('eliminar_usuario') }}"
-                    onsubmit="return confirm('¿Eliminar tu cuenta permanentemente?');"
-                    style="display:inline; margin:0;">
+                    onsubmit="return confirm('¿Eliminar tu cuenta?');" style="display:inline; margin:0;">
                     <button type="submit" class="nav-btn nav-btn-danger">Borrar</button>
                 </form>
                 <span class="navbar-divider">|</span>
@@ -37,7 +37,9 @@
     </nav>
     {% endif %}
 
+    <!-- Contenedor principal -->
     <div class="container">
+        <!-- Mensajes de alerta (errores o éxito) -->
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         {% for category, message in messages %}

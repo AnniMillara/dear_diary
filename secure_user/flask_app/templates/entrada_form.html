@@ -2,6 +2,7 @@
 {% block title %}{{ 'Editar' if entrada and entrada.id_entrada else 'Nueva' }} Entrada{% endblock %}
 {% block contenido %}
 
+<!-- ✧ Formulario de entrada -->
 <div class="page-header">
     <div>
         <h2>{{ 'Editar' if entrada and entrada.id_entrada else 'Nueva' }} Entrada</h2>
@@ -15,6 +16,7 @@
         action="{{ url_for('modificar_entrada', id=entrada.id_entrada) if entrada and entrada.id_entrada else url_for('crear_entrada') }}">
 
         <div class="form-grid">
+            <!-- ✧ Fecha y Emoji -->
             <div class="form-group">
                 <label for="fecha">Fecha</label>
                 <input id="fecha" name="fecha" type="date" class="form-control"
@@ -23,21 +25,22 @@
             </div>
 
             <div class="form-group">
-                <label for="emoji">Emoji</label>
-                <input id="emoji" name="emoji" type="text" class="form-control" maxlength="10" placeholder="Ej: 😊"
+                <label for="emoji">Emoji (Carita)</label>
+                <input id="emoji" name="emoji" type="text" class="form-control" maxlength="10" placeholder="Ej: ʕ•ᴥ•ʔ o 😊"
                     value="{% if entrada and entrada.emoji %}{{ entrada.emoji }}{% endif %}">
             </div>
         </div>
 
+        <!-- 𓂃 Contenido del diario 𓂃 -->
         <div class="form-group mb-3">
             <label for="contenido">Contenido</label>
             <textarea id="contenido" name="contenido" class="form-control" maxlength="5000"
                 required>{{ entrada.contenido if entrada and entrada.contenido else '' }}</textarea>
         </div>
 
+        <!-- ✧ Botones -->
         <div class="d-flex gap-2 flex-wrap mt-4">
-            <button class="btn btn-dark">{{ 'Guardar Cambios' if entrada and entrada.id_entrada else 'Guardar Entrada'
-                }}</button>
+            <button class="btn btn-dark">{{ 'Guardar Cambios' if entrada and entrada.id_entrada else 'Guardar Entrada' }}</button>
             <a class="btn btn-secondary" href="{{ url_for('listado_entradas') }}">Cancelar</a>
         </div>
     </form>

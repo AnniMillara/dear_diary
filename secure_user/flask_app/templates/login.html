@@ -2,12 +2,14 @@
 {% block title %}Querido Diario - Iniciar Sesión{% endblock %}
 
 {% block contenido %}
+<!-- ✧ Cabecera de bienvenida -->
 <div class="login-header">
     <h1>𖡎 Querido Diario</h1>
     <p>Tu espacio privado para escribir cada día ˙ᵕ˙</p>
 </div>
 
 <div class="grid-2">
+    <!-- ✧ Formulario de registro -->
     <div class="login-card">
         <h3>Crear Cuenta</h3>
         <form method="post" action="{{ url_for('registro') }}">
@@ -42,6 +44,7 @@
         </form>
     </div>
 
+    <!-- ✧ Formulario de inicio de sesión -->
     <div class="login-card">
         <h3>Iniciar Sesión</h3>
         <form method="post" action="{{ url_for('login') }}">

@@ -2,23 +2,24 @@ from flask import render_template, redirect, request, session, flash, url_for
 from flask_app import app, bcrypt
 from flask_app.models.usuario import Usuarios
 
+# Mostrar la página de inicio de sesión
 @app.route("/")
 def inicio():
     if "id_usuario" in session:
         return redirect(url_for("listado_entradas"))
     return render_template("login.html")
 
+# Registrar un nuevo usuario
 @app.route("/registro", methods=["POST"])
 def registro():
     datos = {
         "nombre": request.form.get("nombre", "").strip(),
         "apellido": request.form.get("apellido", "").strip(),
-        "email": request.form.get("email", "").strip(),
         "edad": request.form.get("edad", "").strip(),
+        "email": request.form.get("email", "").strip(),
         "contrasena": request.form.get("contrasena", "").strip(),
         "confirmar_contrasena": request.form.get("confirmar_contrasena", "").strip(),
     }
-    
     errores = Usuarios.validar_registro(datos)
     if errores:
         for error in errores:
@@ -29,8 +30,8 @@ def registro():
     data = {
         "nombre": datos["nombre"], 
         "apellido": datos["apellido"], 
+        "edad": datos["edad"],
         "email": datos["email"], 
-        "edad": int(datos["edad"]),
         "contrasena": hash_pw
     }
     
@@ -47,6 +48,7 @@ def registro():
         flash("Error de conexión al crear la cuenta.", "error")
         return redirect(url_for("inicio"))
 
+# Iniciar sesión
 @app.route("/login", methods=["POST"])
 def login():
     email = request.form.get("email", "").strip()
@@ -65,12 +67,14 @@ def login():
         flash("Error de conexión al iniciar sesión.", "error")
         return redirect(url_for("inicio"))
 
+# Cerrar sesión
 @app.route("/logout")
 def logout():
     session.clear()
     flash("Sesión cerrada.", "success")
     return redirect(url_for("inicio"))
 
+# Eliminar la cuenta del usuario
 @app.route("/cuenta/eliminar", methods=["POST"])
 def eliminar_usuario():
     if "id_usuario" not in session:

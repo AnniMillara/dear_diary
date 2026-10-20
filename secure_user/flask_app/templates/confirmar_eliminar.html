@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 {% block title %}Confirmar eliminación{% endblock %}
 {% block contenido %}
-<div class="card-bookhub text-center" style="max-width: 600px; margin: 40px auto; border-left: 4px solid var(--pin-cushion);">
+
+<!-- ✧ Confirmación de borrado -->
+<div class="card-bookhub text-center"
+    style="max-width: 600px; margin: 40px auto; border-left: 4px solid var(--pin-cushion);">
     <h2 style="color: var(--pin-cushion); margin-bottom: 16px;">Confirmar eliminación</h2>
     <p style="margin-bottom: 24px; font-size: 1.1rem;">{{ mensaje }}</p>
     <form method="post" action="{{ accion }}" class="d-flex gap-2 flex-wrap" style="justify-content: center;">
@@ -9,4 +12,5 @@
         <a class="btn btn-secondary" href="{{ cancelar }}">Cancelar</a>
     </form>
 </div>
+
 {% endblock %}
