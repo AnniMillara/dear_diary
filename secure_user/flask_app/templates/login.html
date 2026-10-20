@@ -24,9 +24,15 @@
                 <input type="email" name="email" class="form-control" required>
             </div>
             <div class="mb-3">
+                <label>Edad</label>
+                <input type="number" name="edad" class="form-control" min="18" max="120"
+                    placeholder="Debes tener al menos 18 años" required>
+            </div>
+            <div class="mb-3">
                 <label>Contraseña</label>
-                <input type="password" name="contrasena" class="form-control" required minlength="8" required>
-                <small style="font-size:0.75rem; color:#5a6b5e; display:block; margin-top:4px;">Mín. 8 caracteres, 1 mayúscula, 1 número y 1 símbolo.</small>
+                <input type="password" name="contrasena" class="form-control" required minlength="8">
+                <small style="font-size:0.75rem; color:#5a6b5e; display:block; margin-top:4px;">Mín. 8 caract., 1
+                    mayúscula, 1 número y 1 símbolo.</small>
             </div>
             <div class="mb-3">
                 <label>Confirmar Contraseña</label>

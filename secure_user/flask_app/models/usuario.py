@@ -13,6 +13,7 @@ class Usuarios:
         self.nombre = data["nombre"]
         self.apellido = data["apellido"]
         self.email = data["email"]
+        self.edad = data["edad"]
         self.contrasena = data["contrasena"]
         self.created_at = data["created_at"]
         self.updated_at = data["updated_at"]
@@ -20,93 +21,66 @@ class Usuarios:
     @classmethod
     def guardar(cls, data):
         query = """
-            INSERT INTO usuarios (
-                nombre, 
-                apellido, 
-                email, 
-                contrasena, 
-                created_at, 
-                updated_at
-            ) VALUES (
-                %(nombre)s, 
-                %(apellido)s, 
-                %(email)s, 
-                %(contrasena)s, 
-                NOW(), 
-                NOW()
-            );
+            INSERT INTO usuarios (nombre, apellido, email, edad, contrasena, created_at, updated_at) 
+            VALUES (%(nombre)s, %(apellido)s, %(email)s, %(edad)s, %(contrasena)s, NOW(), NOW());
         """
         return connectToMySQL(DB).query_db(query, data)
 
     @classmethod
     def buscar_email(cls, email):
-        query = """
-            SELECT 
-                * 
-            FROM usuarios 
-            WHERE email = %(email)s;
-        """
+        query = "SELECT * FROM usuarios WHERE email = %(email)s;"
         resultado = connectToMySQL(DB).query_db(query, {"email": email})
         return cls(resultado[0]) if resultado else None
 
     @classmethod
     def buscar_id(cls, id):
-        query = """
-            SELECT 
-                * 
-            FROM usuarios 
-            WHERE id_usuario = %(id_usuario)s;
-        """
+        query = "SELECT * FROM usuarios WHERE id_usuario = %(id_usuario)s;"
         resultado = connectToMySQL(DB).query_db(query, {"id_usuario": id})
         return cls(resultado[0]) if resultado else None
 
     @classmethod
     def eliminar(cls, id):
-        query = """
-            DELETE FROM usuarios 
-            WHERE id_usuario = %(id_usuario)s;
-        """
+        query = "DELETE FROM usuarios WHERE id_usuario = %(id_usuario)s;"
         return connectToMySQL(DB).query_db(query, {"id_usuario": id})
 
     @staticmethod
     def validar_registro(datos):
         errores = []
         
-        # --- VALIDACIÓN DE NOMBRE ---
+        # Nombre y Apellido
         nombre = datos["nombre"].strip()
-        if not nombre:
-            errores.append("El nombre es obligatorio.")
-        elif len(nombre) < 2:
+        if not nombre or len(nombre) < 2:
             errores.append("El nombre debe tener al menos 2 caracteres.")
         elif not NAME_REGEX.match(nombre):
-            errores.append("El nombre solo puede contener letras, no números ni símbolos.")
+            errores.append("El nombre solo puede contener letras.")
 
-        # --- VALIDACIÓN DE APELLIDO ---
         apellido = datos["apellido"].strip()
-        if not apellido:
-            errores.append("El apellido es obligatorio.")
-        elif len(apellido) < 2:
+        if not apellido or len(apellido) < 2:
             errores.append("El apellido debe tener al menos 2 caracteres.")
         elif not NAME_REGEX.match(apellido):
-            errores.append("El apellido solo puede contener letras, no números ni símbolos.")
+            errores.append("El apellido solo puede contener letras.")
 
-        # --- VALIDACIÓN DE EMAIL ---
+        # Email
         email = datos["email"].strip()
-        if not email:
-            errores.append("El email es obligatorio.")
-        elif not EMAIL_REGEX.match(email):
+        if not EMAIL_REGEX.match(email):
             errores.append("El email no tiene un formato válido.")
         elif Usuarios.buscar_email(email):
             errores.append("El email ya está registrado.")
 
-        # --- VALIDACIÓN DE CONTRASEÑA  ---
-        contrasena = datos["contrasena"]
-        if not contrasena:
-            errores.append("La contraseña es obligatoria.")
-        elif not PASSWORD_REGEX.match(contrasena):
-            errores.append("La contraseña debe tener mínimo 8 caracteres, incluyendo una mayúscula, una minúscula, un número y un carácter especial (@$!%*?&.#).")
+        # Edad (BONUS)
+        try:
+            edad = int(datos["edad"])
+            if edad < 18:
+                errores.append("Debes tener al menos 18 años para registrarte.")
+            elif edad > 120:
+                errores.append("Por favor, ingresa una edad válida.")
+        except (ValueError, TypeError):
+            errores.append("La edad debe ser un número válido.")
 
-        # --- VALIDACIÓN CONFIRMACIÓN ---
+        # Contraseña
+        contrasena = datos["contrasena"]
+        if not PASSWORD_REGEX.match(contrasena):
+            errores.append("La contraseña requiere mín. 8 caracteres, 1 mayúscula, 1 número y 1 símbolo.")
         if contrasena != datos["confirmar_contrasena"]:
             errores.append("Las contraseñas no coinciden.")
 

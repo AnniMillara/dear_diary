@@ -30,9 +30,7 @@ body {
 h1,
 h2,
 h3,
-h4,
-h5,
-h6 {
+h4 {
     font-family: var(--font-title);
     font-weight: 700;
 }
@@ -48,6 +46,7 @@ a {
     padding: 0 20px;
 }
 
+/* ===== NAVBAR ===== */
 .navbar-bookhub {
     background-color: var(--thread);
     color: white;
@@ -75,12 +74,22 @@ a {
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
     flex-wrap: wrap;
 }
 
-.nav-links a,
-.nav-links button {
+.navbar-user {
+    color: var(--tape-measure);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.navbar-divider {
+    color: var(--tape-measure);
+    opacity: 0.5;
+}
+
+.nav-btn {
     color: white;
     font-family: var(--font-main);
     font-size: 0.95rem;
@@ -91,24 +100,19 @@ a {
     transition: color 0.2s;
 }
 
-.nav-links a:hover,
-.nav-links button:hover {
+.nav-btn:hover {
     color: var(--rose-ribbon);
 }
 
-.navbar-user {
-    color: var(--tape-measure);
-    font-weight: 600;
+.nav-btn-danger {
+    color: #ffb8b8;
 }
 
-.btn-text-danger {
-    color: #ffb8b8 !important;
+.nav-btn-danger:hover {
+    color: #ff8a8a;
 }
 
-.btn-text-danger:hover {
-    color: #ff8a8a !important;
-}
-
+/* ===== HEADER Y TARJETAS ===== */
 .page-header {
     display: flex;
     justify-content: space-between;
@@ -144,6 +148,30 @@ a {
     flex-direction: column;
     gap: 16px;
     transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.entrada-card:nth-child(6n+1) {
+    border-top-color: var(--pin-cushion);
+}
+
+.entrada-card:nth-child(6n+2) {
+    border-top-color: var(--thread);
+}
+
+.entrada-card:nth-child(6n+3) {
+    border-top-color: var(--buttons);
+}
+
+.entrada-card:nth-child(6n+4) {
+    border-top-color: var(--patchwork);
+}
+
+.entrada-card:nth-child(6n+5) {
+    border-top-color: var(--rose-ribbon);
+}
+
+.entrada-card:nth-child(6n+6) {
+    border-top-color: var(--tape-measure);
 }
 
 .entrada-card:hover {
@@ -190,10 +218,12 @@ a {
     margin-top: auto;
 }
 
+/* ===== BUSCADOR ===== */
 .buscador-wrap {
     position: relative;
     max-width: 500px;
     margin-bottom: 24px;
+    display: block;
 }
 
 .buscador-icono {
@@ -221,6 +251,7 @@ a {
     box-shadow: 0 0 0 4px rgba(204, 145, 61, 0.15);
 }
 
+/* ===== FORMULARIOS ===== */
 .card-bookhub {
     background-color: var(--surface);
     border: 1px solid var(--border);
@@ -271,6 +302,7 @@ textarea.form-control {
     min-height: 250px;
 }
 
+/* ===== BOTONES ===== */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -294,17 +326,9 @@ textarea.form-control {
     color: white;
 }
 
-.btn-dark:hover {
-    background-color: #2B4A35;
-}
-
 .btn-primary {
     background-color: var(--buttons);
     color: white;
-}
-
-.btn-primary:hover {
-    background-color: #E8AC59;
 }
 
 .btn-secondary {
@@ -361,6 +385,7 @@ textarea.form-control {
     width: 100%;
 }
 
+/* ===== LOGIN Y ALERTAS ===== */
 .grid-2 {
     display: grid;
     grid-template-columns: 1fr 1fr;

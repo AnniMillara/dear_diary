@@ -1,4 +1,4 @@
-from flask import render_template, redirect, request, session, flash, url_for, jsonify
+from flask import render_template, redirect, request, session, flash, url_for
 from flask_app import app
 from flask_app.models.entrada import Entradas
 from flask_app.models.usuario import Usuarios
@@ -16,24 +16,26 @@ def listado_entradas():
     if not sesion_valida():
         flash("Tu sesión ha expirado, por favor inicia sesión de nuevo.", "error")
         return redirect(url_for("inicio"))
+    
+    query_busqueda = request.args.get("q", "").strip()
+    
     try:
         entradas = Entradas.ver_por_usuario(session["id_usuario"])
     except Exception:
         flash("No se pudieron cargar las entradas en este momento.", "error")
         entradas = []
-    return render_template("entradas_lista.html", entradas=entradas)
+        
+    return render_template("entradas_lista.html", entradas=entradas, query=query_busqueda)
 
 @app.route("/entradas/nueva")
 def nueva_entrada():
     if not sesion_valida():
-        flash("Tu sesión ha expirado, por favor inicia sesión de nuevo.", "error")
         return redirect(url_for("inicio"))
     return render_template("entrada_form.html", entrada=None)
 
 @app.route("/entradas/crear", methods=["POST"])
 def crear_entrada():
     if not sesion_valida():
-        flash("Tu sesión ha expirado, por favor inicia sesión de nuevo.", "error")
         return redirect(url_for("inicio"))
     
     datos = {
@@ -54,7 +56,7 @@ def crear_entrada():
         flash("Entrada guardada correctamente.", "success")
         return redirect(url_for("listado_entradas"))
     except Exception:
-        flash("Hubo un problema de conexión al guardar.", "error")
+        flash("Hubo un problema al guardar la entrada.", "error")
         return render_template("entrada_form.html", entrada=datos)
 
 @app.route("/entradas/detalle/<int:id>")
@@ -140,30 +142,3 @@ def eliminar_entrada(id):
     except Exception:
         flash("No se pudo eliminar la entrada.", "error")
     return redirect(url_for("listado_entradas"))
-
-@app.route("/entradas/buscar_json")
-def buscar_entradas_json():
-    if not sesion_valida():
-        return jsonify({"error": "no_autorizado"}), 401
-        
-    texto = request.args.get("texto", "").strip()
-    try:
-        if texto:
-            entradas = Entradas.buscar_texto(session["id_usuario"], texto)
-        else:
-            entradas = Entradas.ver_por_usuario(session["id_usuario"])
-    except Exception:
-        return jsonify({"error": "error_db"}), 500
-        
-    return jsonify({
-        "entradas": [{
-            "id": e.id_entrada,
-            "fecha_formato": e.fecha.strftime("%d/%m/%Y"),
-            "emoji": e.emoji,
-            "extracto": _extracto(e.contenido, 180),
-        } for e in entradas]
-    })
-
-def _extracto(contenido, limite):
-    plano = " ".join(contenido.split())
-    return (plano[:limite].rstrip() + "…") if len(plano) > limite else plano

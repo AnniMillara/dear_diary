@@ -14,9 +14,11 @@ def registro():
         "nombre": request.form.get("nombre", "").strip(),
         "apellido": request.form.get("apellido", "").strip(),
         "email": request.form.get("email", "").strip(),
+        "edad": request.form.get("edad", "").strip(),
         "contrasena": request.form.get("contrasena", "").strip(),
         "confirmar_contrasena": request.form.get("confirmar_contrasena", "").strip(),
     }
+    
     errores = Usuarios.validar_registro(datos)
     if errores:
         for error in errores:
@@ -24,7 +26,13 @@ def registro():
         return redirect(url_for("inicio"))
         
     hash_pw = bcrypt.generate_password_hash(datos["contrasena"]).decode("utf-8")
-    data = {"nombre": datos["nombre"], "apellido": datos["apellido"], "email": datos["email"], "contrasena": hash_pw}
+    data = {
+        "nombre": datos["nombre"], 
+        "apellido": datos["apellido"], 
+        "email": datos["email"], 
+        "edad": int(datos["edad"]),
+        "contrasena": hash_pw
+    }
     
     try:
         nuevo_id = Usuarios.guardar(data)
